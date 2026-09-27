@@ -1,6 +1,9 @@
 import os
 import re
 import asyncio
+import http.server
+import socketserver
+import threading
 
 from datetime import datetime
 from dotenv import load_dotenv
@@ -1034,8 +1037,42 @@ async def error_handler(
         f"{type(context.error).__name__}: "
         f"{context.error}"
     )
-    
+
+
+class HealthCheckHandler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+
+    def log_message(self, format, *args):
+        pass
+
+
+class ReusableTCPServer(socketserver.TCPServer):
+    allow_reuse_address = True
+
+
+def start_health_server():
+    port_str = os.environ.get("PORT", "10000")
+    try:
+        port = int(port_str)
+        server = ReusableTCPServer(("0.0.0.0", port), HealthCheckHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        print(f"🌐 Health check server listening on port {port}")
+    except Exception as e:
+        print(f"⚠️ Could not start health check server: {e}")
+
+
 def main():
+    start_health_server()
     initialize_database()
     
     if not TOKEN:

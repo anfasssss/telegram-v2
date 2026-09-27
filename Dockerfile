@@ -28,4 +28,6 @@ COPY data ./data
 RUN mkdir -p /app/downloads
 
 # Start the bot
+EXPOSE 10000
+
 CMD ["python", "-m", "bot.main"]
