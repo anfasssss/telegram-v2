@@ -1,0 +1,10 @@
+venv/
+test_venv/
+.env
+downloads/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+test_generator.py
+test_watermark.py
