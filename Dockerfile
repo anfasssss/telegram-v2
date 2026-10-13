@@ -22,10 +22,9 @@ RUN playwright install --with-deps chromium
 COPY bot ./bot
 COPY services ./services
 COPY utils ./utils
-COPY data ./data
 
-# Create downloads directory
-RUN mkdir -p /app/downloads
+# Create data and downloads directories
+RUN mkdir -p /app/data /app/downloads
 
 # Start the bot
 EXPOSE 10000
